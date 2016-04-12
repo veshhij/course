@@ -113,8 +113,7 @@ sum = foldRight (+) 0
 length ::
   List a
   -> Int
-length Nil       = 0
-length (_ :. xs) = 1 + length xs
+length = foldRight (\_ acc -> acc + 1) 0
 
 -- | Map the given function on each element of the list.
 --
@@ -147,8 +146,8 @@ filter ::
   -> List a
 filter _ Nil       = Nil
 filter p (x :. xs)
-    | p x = x :. filter p xs
-    | otherwise = filter p xs
+    | p x          = x :. filter p xs
+    | otherwise    = filter p xs
 
 -- | Append two lists to a new list.
 --
@@ -184,8 +183,8 @@ infixr 5 ++
 flatten ::
   List (List a)
   -> List a
-flatten =
-  error "todo: Course.List#flatten"
+flatten Nil       = Nil
+flatten (x :. xs) = x ++ flatten xs
 
 -- | Map a function then flatten to a list.
 --
@@ -201,8 +200,7 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap =
-  error "todo: Course.List#flatMap"
+flatMap f xs = flatten $ map f xs
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -211,8 +209,7 @@ flatMap =
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain =
-  error "todo: Course.List#flattenAgain"
+flattenAgain = flatMap id
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -239,8 +236,11 @@ flattenAgain =
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+seqOptional Nil            = Full Nil
+seqOptional (Empty :. _)   = Empty
+seqOptional (Full x :. xs) = case seqOptional xs of
+    (Full l) -> Full $ x :. l
+    _        -> Empty
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -262,8 +262,10 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo: Course.List#find"
+find _ Nil = Empty
+find f (x :. xs)
+    | f x = Full x
+    | otherwise = find f xs
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -281,8 +283,8 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+lengthGT4 = (5 == ) . length . (take 5)
+    --error "todo: Course.List#lengthGT4"
 
 -- | Reverse a list.
 --
@@ -298,8 +300,9 @@ lengthGT4 =
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo: Course.List#reverse"
+reverse = go Nil where
+    go acc Nil = acc
+    go acc (x :. xs) = go (x :. acc) xs
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -313,8 +316,7 @@ produce ::
   (a -> a)
   -> a
   -> List a
-produce =
-  error "todo: Course.List#produce"
+produce f x = x :. produce f (f x)
 
 -- | Do anything other than reverse a list.
 -- Is it even possible?
@@ -328,8 +330,7 @@ produce =
 notReverse ::
   List a
   -> List a
-notReverse =
-  error "todo: Is it even possible?"
+notReverse = reverse
 
 ---- End of list exercises
 
