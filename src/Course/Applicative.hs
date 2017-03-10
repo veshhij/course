@@ -148,7 +148,7 @@ instance Applicative ((->) t) where
     ((->) t (a -> b))
     -> ((->) t a)
     -> ((->) t b)
-  (<*>) f g = error "todo: " -- \y -> f (g y)
+  (<*>) f g = \y -> (f y) (g y)
 
 
 -- | Apply a binary function in the environment.
@@ -176,8 +176,7 @@ lift2 ::
   -> f a
   -> f b
   -> f c
-lift2 =
-  error "todo: Course.Applicative#lift2"
+lift2 f x = (<*>) $ f <$> x
 
 -- | Apply a ternary function in the environment.
 --
@@ -208,8 +207,7 @@ lift3 ::
   -> f b
   -> f c
   -> f d
-lift3 =
-  error "todo: Course.Applicative#lift3"
+lift3 f x y = (<*>) $ lift2 f x y
 
 -- | Apply a quaternary function in the environment.
 --
@@ -241,8 +239,7 @@ lift4 ::
   -> f c
   -> f d
   -> f e
-lift4 =
-  error "todo: Course.Applicative#lift4"
+lift4 f x y z = (<*>) $ lift3 f x y z
 
 -- | Apply, discarding the value of the first argument.
 -- Pronounced, right apply.
@@ -267,8 +264,7 @@ lift4 =
   f a
   -> f b
   -> f b
-(*>) =
-  error "todo: Course.Applicative#(*>)"
+(*>) = lift2 (const id)
 
 -- | Apply, discarding the value of the second argument.
 -- Pronounced, left apply.
@@ -293,8 +289,7 @@ lift4 =
   f b
   -> f a
   -> f b
-(<*) =
-  error "todo: Course.Applicative#(<*)"
+(<*) = lift2 const
 
 -- | Sequences a list of structures to a structure of list.
 --
